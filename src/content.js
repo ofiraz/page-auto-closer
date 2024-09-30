@@ -160,23 +160,26 @@ function isMeetingStatusSuccess() {
   return false;
 }
 
+var text_to_look_for = [
+  'click open zoom.',
+  'click launch meeting below',
+  'having issues with zoom',
+  'meeting has been launched',
+  'having issues with zoom',
+  'launching anjuna'
+]
+
 function isPageTextLikeMeetingLaunch() {
   const pageText = document?.body?.innerText?.toLowerCase() || '';
-  if (pageText.includes('click open zoom.')) {
-    return true;
+
+  for (var i = 0; i < text_to_look_for.length; i++) {
+    text_to_look_for_lower = text_to_look_for[i].toLowerCase();
+
+    if (pageText.includes(text_to_look_for_lower)) {
+      return true;
+    }
   }
-  if (pageText.includes('click launch meeting below')) {
-    return true;
-  }
-  if (pageText.includes('having issues with zoom')) {
-    return true;
-  }
-  if (pageText.includes('meeting has been launched')) {
-    return true;
-  }
-  if (pageText.includes('having issues with zoom')) {
-    return true;
-  }
+  
   return false;
 }
 

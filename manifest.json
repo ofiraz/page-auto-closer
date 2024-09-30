@@ -1,6 +1,6 @@
 {
-  "name": "Meetings Page Auto Closer for Zoom",
-  "description": "Automatically closes the page opened by Zoom to launch meetings and restores focus to the tab you were on before opened.",
+  "name": "External App Page Auto Closer",
+  "description": "Automatically closes the pages launch applications outside Chrome. Restores focus to the tab you were on before opened.",
   "version": "0.3.1",
   "manifest_version": 3,
   "homepage_url": "https://github.com/ChromeAdmin/meetings-page-auto-closer-for-zoom",
@@ -72,7 +72,8 @@
         "*://*.zoomgov.com/y/*",
         "*://*.zoomgov.com/z/*",
         "*://*.zoomgov.com/postattendee*",
-        "*://*.zoomgov.com/wc/leave*"
+        "*://*.zoomgov.com/wc/leave*",
+        "*://*.slack.com/archives/*"
       ],
       "js": [
         "src/content.js"
