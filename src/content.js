@@ -171,11 +171,39 @@ var text_to_look_for = [
   "Join Meeting"
 ]
 
-function isPageTextLikeMeetingLaunch() {
-  log('here1');
-  const pageText = document?.body?.innerText?.toLowerCase() || '';
-  log(pageText);
+var text_to_look_for_from_config = []
 
+// Get configuration - async - becuase this is the way to get it
+function getConfigurationAsync() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get(['configText'], function(result) {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(result.configText || {});
+      }
+    });
+  });
+}
+
+// Example usage with async/await
+async function getConfigurationSync() {
+  try {
+    const configText = await getConfigurationAsync();
+    //console.log('Configuration loaded:', configText);
+
+    text_to_look_for_from_config = configText.split('\n');
+  } catch (error) {
+    console.error('Error loading configuration:', error);
+  }
+}
+
+function isPageTextLikeMeetingLaunch() {
+  const pageText = document?.body?.innerText?.toLowerCase() || '';
+
+  getConfigurationSync();
+
+  /*
   for (var i = 0; i < text_to_look_for.length; i++) {
     text_to_look_for_lower = text_to_look_for[i].toLowerCase();
 
@@ -185,25 +213,16 @@ function isPageTextLikeMeetingLaunch() {
   }
   
   return false;
+  */
 
-  chrome.storage.sync.get('configText', function(data) {
-    if (data.configText) {
-      log('here2');
-      // Split the string by the newline character to get an array of lines
-      lines = data.configText.split('\n');
-      // Traverse through each line
-      lines.forEach(function(line, index) {
-        text_to_look_for_lower = line.toLowerCase();
-        console.log(`toLower - Line-${text_to_look_for_lower}-`);
+  for (var i = 0; i < text_to_look_for_from_config.length; i++) {
+    text_to_look_for_lower = text_to_look_for_from_config[i].toLowerCase();
 
-
-        if (pageText.includes(text_to_look_for_lower)) {
-          return true;
-        }
-      });
+    if (pageText.includes(text_to_look_for_lower)) {
+      return true;
     }
-  });
-  
+  }
+
   return false;
 }
 
