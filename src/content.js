@@ -166,11 +166,15 @@ var text_to_look_for = [
   'having issues with zoom',
   'meeting has been launched',
   'having issues with zoom',
-  'launching anjuna'
+  'launching anjuna',
+  "Launch meeting",
+  "Join Meeting"
 ]
 
 function isPageTextLikeMeetingLaunch() {
+  log('here1');
   const pageText = document?.body?.innerText?.toLowerCase() || '';
+  log(pageText);
 
   for (var i = 0; i < text_to_look_for.length; i++) {
     text_to_look_for_lower = text_to_look_for[i].toLowerCase();
@@ -179,6 +183,26 @@ function isPageTextLikeMeetingLaunch() {
       return true;
     }
   }
+  
+  return false;
+
+  chrome.storage.sync.get('configText', function(data) {
+    if (data.configText) {
+      log('here2');
+      // Split the string by the newline character to get an array of lines
+      lines = data.configText.split('\n');
+      // Traverse through each line
+      lines.forEach(function(line, index) {
+        text_to_look_for_lower = line.toLowerCase();
+        console.log(`toLower - Line-${text_to_look_for_lower}-`);
+
+
+        if (pageText.includes(text_to_look_for_lower)) {
+          return true;
+        }
+      });
+    }
+  });
   
   return false;
 }

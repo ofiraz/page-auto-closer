@@ -9,7 +9,10 @@
     "48": "icons/icon-128.png",
     "128": "icons/icon-128.png"
   },
-  "permissions": [],
+  "permissions": [
+    "storage"   // Include this to allow access to chrome.storage API
+  ],
+  "options_page": "src/options.html",
   "background": {
     "service_worker": "src/background.js"
   },
@@ -73,7 +76,9 @@
         "*://*.zoomgov.com/z/*",
         "*://*.zoomgov.com/postattendee*",
         "*://*.zoomgov.com/wc/leave*",
-        "*://*.slack.com/archives/*"
+        "*://*.slack.com/archives/*",
+        "*://*.webex.com/wbxmjs/*",
+        "*://*.webex.com/webappng/*"
       ],
       "js": [
         "src/content.js"
