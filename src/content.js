@@ -19,6 +19,46 @@ function log(text) {
 
 log('loaded...');
 
+var text_to_look_for = [
+  'click open zoom.',
+  'click launch meeting below',
+  'having issues with zoom',
+  'meeting has been launched',
+  'having issues with zoom',
+  'launching anjuna',
+  "Launch meeting",
+  "Join Meeting"
+]
+
+var text_to_look_for_from_config = []
+
+// Get configuration - async - becuase this is the way to get it
+function getConfigurationAsync() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get(['configText'], function(result) {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(result.configText || {});
+      }
+    });
+  });
+}
+
+// Example usage with async/await
+async function getConfigurationSync() {
+  try {
+    const configText = await getConfigurationAsync();
+    console.log('Configuration loaded:', configText);
+
+    text_to_look_for_from_config = configText.split('\n');
+  } catch (error) {
+    console.error('Error loading configuration:', error);
+  }
+}
+
+getConfigurationSync();
+
 let timeTillCloseMs = getCountdownStartTimeMs();
 
 function getCountdownStartTimeMs() {
@@ -160,60 +200,8 @@ function isMeetingStatusSuccess() {
   return false;
 }
 
-var text_to_look_for = [
-  'click open zoom.',
-  'click launch meeting below',
-  'having issues with zoom',
-  'meeting has been launched',
-  'having issues with zoom',
-  'launching anjuna',
-  "Launch meeting",
-  "Join Meeting"
-]
-
-var text_to_look_for_from_config = []
-
-// Get configuration - async - becuase this is the way to get it
-function getConfigurationAsync() {
-  return new Promise((resolve, reject) => {
-    chrome.storage.sync.get(['configText'], function(result) {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError);
-      } else {
-        resolve(result.configText || {});
-      }
-    });
-  });
-}
-
-// Example usage with async/await
-async function getConfigurationSync() {
-  try {
-    const configText = await getConfigurationAsync();
-    //console.log('Configuration loaded:', configText);
-
-    text_to_look_for_from_config = configText.split('\n');
-  } catch (error) {
-    console.error('Error loading configuration:', error);
-  }
-}
-
 function isPageTextLikeMeetingLaunch() {
   const pageText = document?.body?.innerText?.toLowerCase() || '';
-
-  getConfigurationSync();
-
-  /*
-  for (var i = 0; i < text_to_look_for.length; i++) {
-    text_to_look_for_lower = text_to_look_for[i].toLowerCase();
-
-    if (pageText.includes(text_to_look_for_lower)) {
-      return true;
-    }
-  }
-  
-  return false;
-  */
 
   for (var i = 0; i < text_to_look_for_from_config.length; i++) {
     text_to_look_for_lower = text_to_look_for_from_config[i].toLowerCase();
