@@ -30,16 +30,17 @@ var text_to_look_for = [
   "Join Meeting"
 ]
 
+var matching_urls = []
 var text_to_look_for_from_config = []
 
 // Get configuration - async - becuase this is the way to get it
 function getConfigurationAsync() {
   return new Promise((resolve, reject) => {
-    chrome.storage.sync.get(['configText'], function(result) {
+    chrome.storage.sync.get(['urlsToMatch', 'matchingTextForAutoClose'], function(configItems) {
       if (chrome.runtime.lastError) {
         reject(chrome.runtime.lastError);
       } else {
-        resolve(result.configText || {});
+        resolve(configItems || {});
       }
     });
   });
@@ -48,10 +49,14 @@ function getConfigurationAsync() {
 // Example usage with async/await
 async function getConfigurationSync() {
   try {
-    const configText = await getConfigurationAsync();
-    console.log('Configuration loaded:', configText);
+    const configItems = await getConfigurationAsync();
+    console.log('Configuration loaded');
 
-    text_to_look_for_from_config = configText.split('\n');
+    matching_urls = configItems.urlsToMatch.split('\n');
+    console.log('urlsToMatch:', matching_urls);
+
+    text_to_look_for_from_config = configItems.matchingTextForAutoClose.split('\n');
+    console.log('matchingTextForAutoClose:', text_to_look_for_from_config);
   } catch (error) {
     console.error('Error loading configuration:', error);
   }
