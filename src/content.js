@@ -19,7 +19,69 @@ function log(text) {
 
 log('loaded...');
 
-var text_to_look_for = [
+var default_urls = [
+  "*://*.zoom.us/a/*",
+  "*://*.zoom.us/b/*",
+  "*://*.zoom.us/c/*",
+  "*://*.zoom.us/d/*",
+  "*://*.zoom.us/e/*",
+  "*://*.zoom.us/f/*",
+  "*://*.zoom.us/g/*",
+  "*://*.zoom.us/h/*",
+  "*://*.zoom.us/i/*",
+  "*://*.zoom.us/j/*",
+  "*://*.zoom.us/k/*",
+  "*://*.zoom.us/l/*",
+  "*://*.zoom.us/m/*",
+  "*://*.zoom.us/n/*",
+  "*://*.zoom.us/o/*",
+  "*://*.zoom.us/p/*",
+  "*://*.zoom.us/q/*",
+  "*://*.zoom.us/r/*",
+  "*://*.zoom.us/s/*",
+  "*://*.zoom.us/t/*",
+  "*://*.zoom.us/u/*",
+  "*://*.zoom.us/v/*",
+  "*://*.zoom.us/w/*",
+  "*://*.zoom.us/x/*",
+  "*://*.zoom.us/y/*",
+  "*://*.zoom.us/z/*",
+  "*://*.zoom.us/postattendee*",
+  "*://*.zoom.us/wc/leave*",
+  "*://*.zoomgov.com/a/*",
+  "*://*.zoomgov.com/b/*",
+  "*://*.zoomgov.com/c/*",
+  "*://*.zoomgov.com/d/*",
+  "*://*.zoomgov.com/e/*",
+  "*://*.zoomgov.com/f/*",
+  "*://*.zoomgov.com/g/*",
+  "*://*.zoomgov.com/h/*",
+  "*://*.zoomgov.com/i/*",
+  "*://*.zoomgov.com/j/*",
+  "*://*.zoomgov.com/k/*",
+  "*://*.zoomgov.com/l/*",
+  "*://*.zoomgov.com/m/*",
+  "*://*.zoomgov.com/n/*",
+  "*://*.zoomgov.com/o/*",
+  "*://*.zoomgov.com/p/*",
+  "*://*.zoomgov.com/q/*",
+  "*://*.zoomgov.com/r/*",
+  "*://*.zoomgov.com/s/*",
+  "*://*.zoomgov.com/t/*",
+  "*://*.zoomgov.com/u/*",
+  "*://*.zoomgov.com/v/*",
+  "*://*.zoomgov.com/w/*",
+  "*://*.zoomgov.com/x/*",
+  "*://*.zoomgov.com/y/*",
+  "*://*.zoomgov.com/z/*",
+  "*://*.zoomgov.com/postattendee*",
+  "*://*.zoomgov.com/wc/leave*",
+  "*://*.slack.com/archives/*",
+  "*://*.webex.com/wbxmjs/*",
+  "*://*.webex.com/webappng/*"
+]
+
+var default_text_to_look_for = [
   'click open zoom.',
   'click launch meeting below',
   'having issues with zoom',
@@ -27,7 +89,8 @@ var text_to_look_for = [
   'having issues with zoom',
   'launching anjuna',
   "Launch meeting",
-  "Join Meeting"
+  "Join Meeting",
+  "Chat on WhatsApp with"
 ]
 
 var matching_urls = []
@@ -48,14 +111,25 @@ function getConfigurationAsync() {
 
 // Example usage with async/await
 async function getConfigurationSync() {
+  // Always start from the built-in defaults, then layer on whatever the
+  // user saved on the options page. This way the hardcoded defaults keep
+  // working even if the user never opened/saved the options page, and
+  // config values are additive rather than replacing the defaults.
+  matching_urls = [...default_urls];
+  text_to_look_for_from_config = [...default_text_to_look_for];
+
   try {
     const configItems = await getConfigurationAsync();
     console.log('Configuration loaded');
 
-    matching_urls = configItems.urlsToMatch.split('\n');
+    if (configItems.urlsToMatch) {
+      matching_urls = matching_urls.concat(configItems.urlsToMatch.split('\n').filter(Boolean));
+    }
     console.log('urlsToMatch:', matching_urls);
 
-    text_to_look_for_from_config = configItems.matchingTextForAutoClose.split('\n');
+    if (configItems.matchingTextForAutoClose) {
+      text_to_look_for_from_config = text_to_look_for_from_config.concat(configItems.matchingTextForAutoClose.split('\n').filter(Boolean));
+    }
     console.log('matchingTextForAutoClose:', text_to_look_for_from_config);
   } catch (error) {
     console.error('Error loading configuration:', error);
@@ -65,6 +139,27 @@ async function getConfigurationSync() {
 getConfigurationSync();
 
 let timeTillCloseMs = getCountdownStartTimeMs();
+var intervalId = 0;
+
+/*
+chrome.storage.sync.get(['urlsToMatch'], function(data) {
+  if (data) {
+    matching_urls = data.urlsToMatch.split('\n');
+
+    currentUrl = window.location.href;
+    console.log(currentUrl);
+    console.log(matching_urls);
+    if (matching_urls.some(pattern => currentUrl.includes(pattern))) {
+      console.log("This page is allowed by the config. Running extension logic.");
+
+      intervalId = setInterval(countDownToClose, intervalRateMs);
+
+    } else {
+      console.log("This page is not allowed by the config. Skipping script.");
+    }
+  }
+})
+*/
 
 function getCountdownStartTimeMs() {
   const defaultStartTimeMs = 21 * 1000;
@@ -243,4 +338,4 @@ function closeThisTabNow() {
   chrome.runtime.sendMessage({ pleaseCloseThisTab: true });
 }
 
-let intervalId = setInterval(countDownToClose, intervalRateMs);
+intervalId = setInterval(countDownToClose, intervalRateMs);

@@ -1,5 +1,10 @@
 .meetings-page-auto-closer-for-zoom-wrapper {
-  position: absolute;
+  /* `fixed` (not `absolute`) so this is pinned to the viewport instead of
+     being positioned relative to whatever positioned ancestor the host
+     page happens to have - some pages (e.g. WhatsApp's click-to-chat page)
+     have their own stacking contexts that can otherwise push this
+     off-screen or bury it. */
+  position: fixed;
   margin: auto;
   left: 0;
   right: 0;
@@ -7,7 +12,8 @@
   /* top: 8px; */
   top: 0;
   /* Because we added padding, we need to skoot back to the top */
-  z-index: 999;
+  /* Max z-index so we always render above the host page's own UI. */
+  z-index: 2147483647;
   width: fit-content;
 }
 

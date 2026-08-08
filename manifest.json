@@ -10,7 +10,7 @@
     "128": "icons/icon-128.png"
   },
   "permissions": [
-    "storage"   // Include this to allow access to chrome.storage API
+    "storage"   
   ],
   "options_page": "src/options.html",
   "background": {
@@ -78,7 +78,8 @@
         "*://*.zoomgov.com/wc/leave*",
         "*://*.slack.com/archives/*",
         "*://*.webex.com/wbxmjs/*",
-        "*://*.webex.com/webappng/*"
+        "*://*.webex.com/webappng/*",
+        "*://api.whatsapp.com/send*"
       ],
       "js": [
         "src/content.js"
